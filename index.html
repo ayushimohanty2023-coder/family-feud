@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GSC DC Family Feud</title>
+<style>
+:root{--bg:#0b1b4d;--bg2:#16307f;--gold:#ffc83d;--ink:#fff;--mute:#a9b6e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% 0,var(--bg2),var(--bg) 70%) fixed;background-color:#0b1b4d;color:var(--ink);font-family:"Trebuchet MS",Verdana,sans-serif;min-height:100vh}
+#app{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:clamp(28px,6vw,52px);margin:8px 0;text-align:center;color:var(--gold);text-transform:uppercase;letter-spacing:2px;text-shadow:0 3px 0 #7a5200}
+.card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:16px;padding:18px}
+.btn{background:var(--gold);color:#2a1d00;border:0;border-radius:12px;padding:12px 20px;font:inherit;font-weight:700;cursor:pointer;font-size:16px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid rgba(255,255,255,.35)}
+.btn:disabled{opacity:.35;cursor:default}
+input,select{width:100%;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,.3);background:#0a1640;color:#fff;font:inherit;font-size:16px}
+.setup{display:grid;gap:12px;max-width:520px;margin:20px auto}
+.setup label{display:flex;gap:10px;align-items:center}
+.dot{width:18px;height:18px;border-radius:50%;flex:none}
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.sc{border-radius:12px;padding:8px;text-align:center;border:3px solid;background:rgba(0,0,0,.3)}
+.sc b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc span{font-size:clamp(24px,5vw,38px);font-weight:800;color:var(--gold)}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:14px}
+.q{font-size:clamp(20px,3.6vw,32px);text-align:center;margin:10px 0 14px;font-weight:700}
+.board{display:grid;gap:10px;perspective:1000px}
+.tile{height:68px;cursor:pointer}
+.in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.tile.rev .in{transform:rotateX(180deg)}
+.f,.b{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center}
+.f{justify-content:center;font-size:34px;font-weight:800;background:linear-gradient(#2a4ed0,#14308f);border:3px solid var(--gold);color:var(--gold)}
+.b{transform:rotateX(180deg);background:#fff;color:#12204f;padding:6px 10px;gap:10px;border:3px solid var(--gold)}
+.b .t{flex:1;font-weight:800;font-size:clamp(14px,2.6vw,22px);text-transform:uppercase;line-height:1.1}
+.b .p{background:#12204f;color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:800;font-size:20px}
+.chips{display:flex;gap:4px}
+.chip{border:2px solid;border-radius:8px;background:#fff;font:inherit;font-weight:700;font-size:11px;padding:6px 6px;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.ctrl{display:flex;gap:10px;justify-content:space-between;margin-top:16px;flex-wrap:wrap}
+.lb{display:grid;gap:10px;margin:16px 0}
+.row{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;border:3px solid;background:rgba(0,0,0,.3);font-size:clamp(18px,3.5vw,28px);font-weight:800}
+.row .n{width:46px;text-align:center}.row .nm{flex:1}.row .pt{color:var(--gold)}
+.row.ghost{opacity:.4;border:3px dashed rgba(255,255,255,.3)!important}
+.wig{animation:wig 1s ease-out}
+@keyframes wig{0%{transform:translateX(-120%) rotate(-4deg);opacity:0}45%{transform:translateX(4%) rotate(3deg);opacity:1}60%{transform:rotate(-3deg)}75%{transform:rotate(2deg)}88%{transform:rotate(-1deg)}100%{transform:none}}
+.row.win{background:rgba(255,200,61,.18)}
+@media(max-width:640px){.chips{flex-direction:column}.chip{font-size:10px;padding:2px 4px}.tile{height:84px}}
+</style></head><body><div id="app"></div>
+<script>
+const Q=[
+["What are the Global Shapers Impact Areas",["Reskilling for the Future","Strengthening Civic Engagement","Creating Inclusive Communities","Protecting the Planet"]],
+["Name Office Leads",["Shahaan","Diyora","Rudra","Maya & Avyaan"]],
+["Name Hubs in the US NE Region (other than DC)",["New York Area","Cambridge or Boston","Pittsburgh","New Haven"]],
+["What are the different positions in Shapers broadly?",["Curator","Impact Officer","Vice Curator","Community Champion"]],
+["Name leaders of WEF and the Global Shapers",["Klaus Schwab","David M. Rubenstein","Natalie Pierce","Michelle Goyhman"]],
+["Which WEF or Global Shapers conferences are hosted yearly?",["Annual Meeting in Davos","Annual Meeting of New Champions in China","Annual Meeting of New Leaders","Global Shapers Summit"]],
+["What projects does the DC Hub currently engage in?",["International Dialogue","Hot Meal Grant Program","Shred the Debt","Party at the Polls"]],
+["Most used Metro stations in DC",["Metro Center","L'Enfant Plaza","Foggy Bottom–GWU","Gallery Place–Chinatown"]],
+["Most visited Smithsonian museums",["National Museum of Natural History (3.3 Mil)","National Air and Space Museum (1.9 Mil)","National Museum of American History (1.8 Mil)","National Museum of African American History and Culture (1.4 Mil)"]],
+["Where do commuters to DC come from? (Counties)",["Montgomery County, MD (~14.8%)","Fairfax County, VA (~13.2%)","Arlington County, VA (~6.0%)","Alexandria, VA (~3.5%)"]]
+];
+const COL=['#ff5a5f','#4da3ff','#3ddc84','#c77dff'];
+let S;
+function fresh(names,flat){return{screen:'setup',teams:names||['Team 1','Team 2','Team 3','Team 4'],flat:!!flat,qi:0,rev:Q.map(q=>q[1].map(()=>false)),own:Q.map(()=>({}))}}
+S=fresh();
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pts=(q,i)=>q===1?10:(i+1)*10;
+function score(t){let s=0;Q.forEach((q,qi)=>q[1].forEach((_,i)=>{if(S.rev[qi][i]&&(S.own[qi][i]||[]).includes(t))s+=pts(qi,i)}));return s}
+function scoreBar(){return'<div class="scores">'+S.teams.map((n,t)=>`<div class="sc" style="border-color:${COL[t]}"><b>${esc(n)}</b><span id="s${t}">${score(t)}</span></div>`).join('')+'</div>'}
+function render(){
+ if(S.screen==='setup'){
+  app.innerHTML=`<h1>GSC DC Family Feud</h1><div class="card setup"><div style="text-align:center;color:var(--mute)">Name your 4 teams</div>`+
+  S.teams.map((n,t)=>`<label><span class="dot" style="background:${COL[t]}"></span><input id="tn${t}" value="${esc(n)}" maxlength="20"></label>`).join('')+
+  `  <button class="btn" data-act="start">Start Game</button></div>`;
+ } else if(S.screen==='game'){
+  const q=Q[S.qi],last=S.qi===Q.length-1;
+  app.innerHTML=`<div class="meta"><span>Question ${S.qi+1} of ${Q.length}</span><span>Click a tile to reveal · keys 1–9</span></div>
+  <div class="q">${esc(q[0])}</div><div class="board">`+
+  q[1].map((a,i)=>`<div class="tile" id="t${i}" data-act="reveal" data-i="${i}"><div class="in"><div class="f">${i+1}</div><div class="b"><div class="t">${esc(a)}</div><div class="chips">`+
+  S.teams.map((n,t)=>`<button class="chip" data-act="own" data-i="${i}" data-t="${t}" style="border-color:${COL[t]}">${esc(n)}</button>`).join('')+
+  `</div><div class="p">${pts(S.qi,i)}</div></div></div></div>`).join('')+
+  `</div><div class="ctrl"><button class="btn ghost" data-act="prev" ${S.qi?'':'disabled'}>← Back</button><button class="btn ghost" data-act="all">Reveal all</button>
+  <button class="btn" data-act="${last?'finish':'next'}">${last?'Final Leaderboard 🏆':'Next question →'}</button></div>`;
+  upd();
+ } else {
+  const r=S.teams.map((n,t)=>({n,t,s:score(t)})).sort((a,b)=>b.s-a.s),top=r[0].s,k=S.shown||0,N=r.length;
+  app.innerHTML=`<h1>🏆 Leaderboard</h1><div class="lb">`+r.map((x,i)=>{
+   if(i<N-k)return`<div class="row ghost"><span class="n">${i+1}</span><span class="nm">?</span></div>`;
+   const rank=r.findIndex(y=>y.s===x.s)+1;
+   return`<div class="row ${x.s===top&&top>0?'win':''} ${i===N-k?'wig':''}" style="border-color:${COL[x.t]}"><span class="n">${['🥇','🥈','🥉'][rank-1]||rank}</span><span class="nm">${esc(x.n)}</span><span class="pt">${x.s}</span></div>`}).join('')+
+  `</div><div class="ctrl"><button class="btn ghost" data-act="back">← Back to game</button>`+(k<N?`<button class="btn" data-act="nextreveal">${k===N-1?'Reveal the winner 🏆':'Reveal next team'}</button>`:`<button class="btn" data-act="restart">🔄 Restart</button>`)+`</div>`;
+ }
+}
+function upd(){
+ const qi=S.qi;
+ Q[qi][1].forEach((_,i)=>{
+  const el=$('#t'+i);el.classList.toggle('rev',S.rev[qi][i]);
+  el.querySelectorAll('.chip').forEach(c=>{const on=(S.own[qi][i]||[]).includes(+c.dataset.t),col=COL[+c.dataset.t];c.style.background=on?col:'#fff';c.style.color=on?'#0a1030':'#12204f'});
+ });
+}
+app.addEventListener('click',e=>{
+ const el=e.target.closest('[data-act]');if(!el)return;
+ const a=el.dataset.act,i=+el.dataset.i,t=+el.dataset.t;
+ if(a==='start'){S.teams=S.teams.map((_,k)=>$('#tn'+k).value.trim()||'Team '+(k+1));S.screen='game';render()}
+ else if(a==='reveal'){if(!S.rev[S.qi][i]){S.rev[S.qi][i]=true;upd()}}
+ else if(a==='own'){e.stopPropagation();const o=S.own[S.qi][i]||[];S.own[S.qi][i]=o.includes(t)?o.filter(x=>x!==t):[...o,t];upd()}
+ else if(a==='next'){S.qi++;render()}
+ else if(a==='prev'){S.qi--;render()}
+ else if(a==='all'){S.rev[S.qi]=S.rev[S.qi].map(()=>true);upd()}
+ else if(a==='finish'){S.screen='final';S.shown=0;render()}
+ else if(a==='nextreveal'){S.shown=Math.min(S.teams.length,(S.shown||0)+1);render()}
+ else if(a==='back'){S.screen='game';render()}
+ else if(a==='restart'){S=fresh(S.teams);render()}
+});
+document.addEventListener('keydown',e=>{
+ if(/INPUT|SELECT/.test(e.target.tagName))return;
+ if(S.screen==='final'){if([' ','Enter','ArrowRight'].includes(e.key)&&(S.shown||0)<S.teams.length){e.preventDefault();S.shown=(S.shown||0)+1;render()}return}
+ if(S.screen!=='game')return;
+ const n=parseInt(e.key);
+ if(n>=1&&n<=Q[S.qi][1].length){S.rev[S.qi][n-1]=true;upd()}
+ else if(e.key==='ArrowRight'&&S.qi<Q.length-1){S.qi++;render()}
+ else if(e.key==='ArrowLeft'&&S.qi>0){S.qi--;render()}
+});
+render();
+</script></body></html>
